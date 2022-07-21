@@ -1,0 +1,152 @@
+<div class="octane-ai-quiz " data-quiz-id="0hkkMz1TmpRxUn05" data-embed-type="fullpage" data-mobile-height="match_browser" data-desktop-height="match_browser"></div>
+<script src="https://app.octaneai.com/o6stmyl9j5sxaskn/quiz.js" async="" defer="defer"></script>
+<style>
+.oct-quiz-wrapper--result-page .oct-quiz-product-block {
+    width: 25%;
+    /* float: left; */
+    margin-top: 10px !important;
+    margin-bottom: 0;
+    height: auto;
+    max-height: 250px;
+    padding-top: 0px;
+}
+.oct-quiz-wrapper--result-page .oct-quiz-content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.oct-quiz-email-wrapper p {
+    visibility: hidden;
+}
+.oct-quiz-email-wrapper p:after {
+    content: 'Make sure your email is formatted correctly';
+    visibility: visible;
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
+}
+</style>
+<script>
+function insertAfter(referenceNode, newNode) {
+  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+//RANDOMLY SORT PRODUCT BLOCKS ON RESULT PAGE
+const randomiseFlexOrder = querySelector => {
+  [...querySelector].map((c,i,a) => c.style.order = Math.floor(Math.random() * a.length + 1));
+};
+
+const products = [["All Products","https://www.westcoastseeds.com/collections/vegetable-seeds"],["Cucamelon", "https://www.westcoastseeds.com/products/cucamelon"], ["Rainbow Blend", "https://www.westcoastseeds.com/products/rainbow-blend"]];
+
+//RUN ON RESULTS PAGE
+document.addEventListener('octane.quiz.completed', function (e) {
+    // your code for building and handling the results page
+    //randomize order
+    randomiseFlexOrder(document.querySelectorAll('.oct-quiz-product-block'));
+    //create product dropdowns
+    const collectionLinks = document.querySelectorAll('.oct-quiz-product-block a');
+    for (let i = 0; i < collectionLinks.length; i++) {
+      collectionLinks[i].addEventListener("click", function(e) {
+        e.preventDefault();
+        console.log('Collection Clicked: ', collectionLinks[i].href);
+        var ul = document.createElement("ul");
+        for (let p = 0; p <= products.length - 1; p++) {
+            var li = document.createElement('li');
+            var prodLink = document.createElement('a');
+            prodLink.href = products[p][1];
+            prodLink.innerHTML = products[p][0];
+            li.appendChild(prodLink);
+            ul.appendChild(li);     // append li to ul.
+        }
+        insertAfter(collectionLinks[i], ul)
+      });
+    }
+    console.log('finished quiz!');
+    }, false);
+</script>
+<script>
+//MUTATION OBSERVERS TO ADD NAME AND OTHER CUSTOM PROPERTIES INTO OCTANE SECTION CONTENT
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                resolve(document.querySelector(selector));
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
+let suppliedName;
+// waitForElm('.oct-quiz-wrapper--collect-text .oct-quiz-btn--primary').then((elm) => {
+//     watchOctaneChanges(elm)
+// });
+function watchOctaneChanges(element) {
+  console.log('Name input is ready');
+  let nameInput = document.querySelector('.oct-quiz-collect-text-wrapper input');
+  element.addEventListener("click", function() {
+     suppliedName = nameInput.value;
+     console.log('captured username: ', suppliedName);
+  });
+  waitForElm('.oct-quiz-wrapper--explainer').then((elm2) => {
+    insertUserName(elm2);
+  });
+}
+function insertUserName(element) {
+  console.log('Name explainer section up') ;
+  let nameTitle = element.querySelector('.oct-quiz-title');
+  if (suppliedName && !nameTitle.textContent.includes(suppl)) {
+    nameTitle.textContent = suppliedName + ", " + nameTitle.textContent.toLocaleLowerCase();
+  }
+}
+
+var nameInsertObserver = new MutationObserver(function(mutations) {
+  let explainerWrapper = document.querySelector('.oct-quiz-wrapper--explainer');
+  if (explainerWrapper != null) {
+      console.log("explainer section up");
+      let nameTitle = document.querySelector('.oct-quiz-title');
+      if (nameTitle.textContent.includes("true gardener's name")) {
+        console.log('name title section...inserting name');
+        if (suppliedName && !nameTitle.textContent.includes(suppliedName)) {
+          nameTitle.textContent = suppliedName + ", " + nameTitle.textContent.toLocaleLowerCase();
+        }
+      }
+      // newObserver.disconnect();
+      //We can disconnect observer once the element exist if we dont want observe more changes in the DOM
+  }
+});
+// Start observing
+nameInsertObserver.observe(document.body, { //document.body is node target to observe
+    childList: true, //This is a must have for the observer with subtree
+    subtree: true //Set to true if changes must also be observed in descendants.
+});
+
+var nameInputObserver = new MutationObserver(function(mutations) {
+  let continueButton = document.querySelector('.oct-quiz-wrapper--collect-text .oct-quiz-btn--primary');
+  if (continueButton != null) {
+      console.log("Name input is ready");
+      let nameInput = document.querySelector('.oct-quiz-collect-text-wrapper input');
+      let continueButton = document.querySelector('.oct-quiz-wrapper--collect-text .oct-quiz-btn--primary');
+      continueButton.addEventListener("click", function() {
+         suppliedName = nameInput.value;
+         console.log('captured username: ', suppliedName);
+      });
+      // newObserver.disconnect();
+      //We can disconnect observer once the element exist if we dont want observe more changes in the DOM
+  }
+});
+// Start observing
+nameInputObserver.observe(document.body, { //document.body is node target to observe
+    childList: true, //This is a must have for the observer with subtree
+    subtree: true //Set to true if changes must also be observed in descendants.
+});
+</script>
